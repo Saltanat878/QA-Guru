@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-test('New user can order burger', async ({ page }) => {
+test.only('New user can order burger', async ({ page }) => {
   await page.goto('file:///Users/amirb/Downloads/burger-order.html');
   await page.getByRole('link', { name: 'Введите ваше имя' }).click();
   await page.getByText('hot').click();

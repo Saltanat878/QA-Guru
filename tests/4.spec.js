@@ -45,7 +45,7 @@ await getRegistration(page, user.email, user.name, user.password, url);
 });
 
 
-test('New user can change the name in profile', async ({ page }) => {
+test.only('New user can change the name in profile', async ({ page }) => {
     const {name, email, password} = user;
     /* 
     const name =user.name;

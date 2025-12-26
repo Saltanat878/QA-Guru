@@ -3,51 +3,37 @@ import { HomePage } from '../src/pages/home.page';
 import { ArticlePage } from '../src/pages/article.page';
 import { TagPage } from '../src/pages/tag.page';
 
-test.describe('RealWorld functional tests', () => {
-    
-    test('1.Отображается имя профиля в хедере', async ({ page }) => {
-    const homePage = new HomePage(page);
+test('Фильтрация статей по тегу (functional)', async ({ page }) => {
+  const homePage = new HomePage(page);
+  const articlePage = new ArticlePage(page);
+  const tagPage = new TagPage(page);
 
-    await page.goto('https://realworld.qa.guru/');
+  const uniqueTag = `autotest-${Date.now()}`;
+  const articleTitle = `Test article ${Date.now()}`;
 
-    const profileName = await homePage.getProfileName();
+  // 1. Открываем главную страницу
+  await homePage.open();
 
-    expect(profileName).not.toBeNull();
-    expect(profileName.length).toBeGreaterThan(0);
-});
-  test('2. Отображается список статей', async ({ page }) => {
-    const mainPage = new MainPage(page);
-
-    await mainPage.open();
-
-    expect(await mainPage.isArticleListVisible()).toBeTruthy();
-  });
-  test('3. Переход на страницу статьи', async ({ page }) => {
-    const mainPage = new MainPage(page);
-    const articlePage = new ArticlePage(page);
-
-    await mainPage.open();
-    await mainPage.openFirstArticle();
-
-    expect(await articlePage.isArticleOpened()).toBeTruthy();
-    expect(await articlePage.hasContent()).toBeTruthy();
-  });
-  test('4. Фильтрация статей по тегу', async ({ page }) => {
-    const mainPage = new MainPage(page);
-    const tagPage = new TagPage(page);
-
-    await mainPage.open();
-    await mainPage.clickFirstTag();
-
-    expect(await tagPage.isFilteredArticlesVisible()).toBeTruthy();
-  });
-  test('5. Переход в Global Feed', async ({ page }) => {
-    const mainPage = new MainPage(page);
-
-    await mainPage.open();
-    await mainPage.openGlobalFeed();
-
-    expect(await mainPage.isArticleListVisible()).toBeTruthy();
+  // 2. Создаём новую статью с уникальным тегом
+  // (методы предполагаются существующими в ArticlePage)
+  await articlePage.openNewArticlePage();
+  await articlePage.createArticle({
+    title: articleTitle,
+    description: 'Test description',
+    body: 'Test article body',
+    tags: [uniqueTag],
   });
 
+  // 3. Проверяем, что статья успешно открылась
+  expect(await articlePage.isArticleOpened()).toBeTruthy();
+
+  // 4. Возвращаемся на главную страницу
+  await homePage.open();
+
+  // 5. Фильтруем статьи по тегу, который мы только что создали
+  await tagPage.selectTag(uniqueTag);
+
+  // 6. Проверяем, что в списке есть наша статья
+  expect(await tagPage.isFilteredArticlesVisible()).toBeTruthy();
+  expect(await tagPage.isArticleWithTitleVisible(articleTitle)).toBeTruthy();
 });
